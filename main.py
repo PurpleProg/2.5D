@@ -4,6 +4,7 @@ Licence: GPL-3+
 import sys
 import pygame
 from level import Level
+from utils import draw_line
 
 
 class Game:
@@ -21,7 +22,7 @@ class Game:
         self.FPS = 60
 
         self.level = Level()
-
+        self.keys = set()
         self.running = True
 
     def mainloop(self) -> None:
@@ -39,13 +40,35 @@ class Game:
                     pygame.quit()
                     self.running = False
                     sys.exit()
+                case pygame.KEYDOWN:
+                    match event.key:
+                        case pygame.K_RIGHT:
+                            self.keys.add('RIGHT')
+                        case pygame.K_LEFT:
+                            self.keys.add('LEFT')
+                        case pygame.K_UP:
+                            self.keys.add('UP')
+                        case pygame.K_DOWN:
+                            self.keys.add('DOWN')
+                case pygame.KEYUP:
+                    match event.key:
+                        case pygame.K_RIGHT:
+                            self.keys.remove('RIGHT')
+                        case pygame.K_LEFT:
+                            self.keys.remove('LEFT')
+                        case pygame.K_UP:
+                            self.keys.remove('UP')
+                        case pygame.K_DOWN:
+                            self.keys.remove('DOWN')
+
 
     def update(self) -> None:
         """ update the level """
-        # self.level.update()
+        self.level.update(self.keys)
 
     def render(self) -> None:
         """ render the level """
+        self.display.fill('#000000')
 
         self.level.render(self.display)
 
