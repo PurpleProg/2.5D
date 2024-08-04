@@ -41,6 +41,10 @@ class Game:
                     sys.exit()
                 case pygame.KEYDOWN:
                     match event.key:
+                        case pygame.K_ESCAPE:
+                            self.running = False
+                            pygame.quit()
+                            sys.exit()
                         case pygame.K_RIGHT:
                             self.keys.add('RIGHT')
                         case pygame.K_LEFT:

@@ -9,6 +9,7 @@ class Level:
     """ handle map and raycasting """
     def __init__(self) -> None:
         self.map: list[list[int]] = [
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,],
             [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
             [1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1,],
@@ -40,25 +41,25 @@ class Level:
         """ draw a line to next wall, use player.angle """
 
         # avoid undef tangent
-        if abs(math.cos(player.angle)) < 1e-10:
+        if abs(math.cos(player.angle)) < 1e-17:
             return
 
         # calc tangent once per frame
-        tangent = math.tan(player.angle)
+        tangent = (1/math.tan(player.angle))
 
         # get nearest line
         initial_pos_y = round(player.rect.centery / 64) * 64
 
         # the ray goes max 10 * 64 if no wall are found.
         # this loop should be break in a normal use
-        for i in range(11):
+        for i in range(1, 11):
             # looking down
             if 0 < player.angle and player.angle < math.pi:
                 end_pos_y = initial_pos_y + (64 * i)
                 end_pos_x = player.rect.centerx + (tangent * abs(end_pos_y - player.rect.centery))
             # looking up
             elif math.pi < player.angle and player.angle < 2 * math.pi:
-                end_pos_y = initial_pos_y - (64 * (i + 1))
+                end_pos_y = initial_pos_y - (64 * (i))
                 end_pos_x = player.rect.centerx - (tangent * abs(end_pos_y - player.rect.centery))
 
             # clamp map indexs to map size
