@@ -4,7 +4,6 @@ Licence: GPL-3+
 import sys
 import pygame
 from level import Level
-from utils import draw_line
 
 
 class Game:
@@ -17,12 +16,12 @@ class Game:
         # self.display = pygame.display.set_mode(size=(1024, 512), flags=pygame.FULLSCREEN)
         pygame.display.set_caption('2.5D engine')
 
-        # clock for FPS
+        # clock for fps
         self.clock = pygame.Clock()
-        self.FPS = 60
+        self.fps = 60
 
         self.level = Level()
-        self.keys = set()
+        self.keys: set[str] = set()
         self.running = True
 
     def mainloop(self) -> None:
@@ -50,6 +49,10 @@ class Game:
                             self.keys.add('UP')
                         case pygame.K_DOWN:
                             self.keys.add('DOWN')
+                        case pygame.K_a:
+                            self.keys.add('a')
+                        case pygame.K_d:
+                            self.keys.add('d')
                 case pygame.KEYUP:
                     match event.key:
                         case pygame.K_RIGHT:
@@ -60,6 +63,10 @@ class Game:
                             self.keys.remove('UP')
                         case pygame.K_DOWN:
                             self.keys.remove('DOWN')
+                        case pygame.K_a:
+                            self.keys.remove('a')
+                        case pygame.K_d:
+                            self.keys.remove('d')
 
 
     def update(self) -> None:
@@ -73,7 +80,7 @@ class Game:
         self.level.render(self.display)
 
         pygame.display.flip()
-        self.clock.tick(self.FPS)
+        self.clock.tick(self.fps)
 
 
 def main() -> None:
