@@ -32,7 +32,7 @@ class Game:
             self.render()
 
     def handel_events(self) -> None:
-        """ get events """
+        """ store event in the game.keys set """
         for event in pygame.event.get():
             match event.type:
                 case pygame.QUIT:

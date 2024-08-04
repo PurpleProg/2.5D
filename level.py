@@ -10,7 +10,7 @@ class Level:
     def __init__(self) -> None:
         self.map: list[list[int]] = [
             [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,],
+            [1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1,],
             [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
             [1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1,],
             [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
@@ -45,7 +45,7 @@ class Level:
             return
 
         # calc tangent once per frame
-        tangent = (1/math.tan(player.angle))
+        invert_tangent = (1/math.tan(player.angle))
 
         # get nearest line
         initial_pos_y = round(player.rect.centery / 64) * 64
@@ -56,17 +56,15 @@ class Level:
             # looking down
             if 0 < player.angle and player.angle < math.pi:
                 end_pos_y = initial_pos_y + (64 * i)
-                end_pos_x = player.rect.centerx + (tangent * abs(end_pos_y - player.rect.centery))
+                end_pos_x = player.rect.centerx + (invert_tangent * abs(end_pos_y - player.rect.centery))
             # looking up
             elif math.pi < player.angle and player.angle < 2 * math.pi:
-                end_pos_y = initial_pos_y - (64 * (i))
-                end_pos_x = player.rect.centerx - (tangent * abs(end_pos_y - player.rect.centery))
+                end_pos_y = initial_pos_y - (64 * i)
+                end_pos_x = player.rect.centerx - (invert_tangent * abs(end_pos_y - player.rect.centery))
 
             # clamp map indexs to map size
             map_index_y = min(int(max(end_pos_y / 64, 0)), len(self.map) - 1)
-            map_index_x = min(int(max(end_pos_x, 0) // 64), len(self.map[0]) - 1)
-
-            print(tangent)
+            map_index_x = min(int(max(end_pos_x / 64, 0)), len(self.map[0]) - 1)
 
             # find collision with walls
             if self.map[map_index_y][map_index_x]:
