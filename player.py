@@ -28,14 +28,18 @@ class Player:
         elif 'DOWN' in keys:
             self.rect.x += math.cos(self.angle + math.pi) * self.speed
             self.rect.y += math.sin(self.angle + math.pi) * self.speed
+        if 'a' in keys:
+            self.rect.x += math.cos(self.angle - (math.pi/2)) * self.speed
+            self.rect.y += math.sin(self.angle - (math.pi/2)) * self.speed
+        elif 'd' in keys:
+            self.rect.x += math.cos(self.angle + (math.pi/2)) * self.speed
+            self.rect.y += math.sin(self.angle + (math.pi/2)) * self.speed
 
         # change angle
         if 'RIGHT' in keys:
             self.angle += 0.05
         elif 'LEFT' in keys:
             self.angle -= 0.05
-        if 'a' in keys:
-            self.angle = 0
 
     def render(self, canvas: pygame.Surface) -> None:
         """ draw player to screen """
