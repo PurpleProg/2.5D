@@ -65,9 +65,24 @@ class Level:
             [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,],
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,],
         ]
+        self.map_3: list[list[int]] = [
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1],
+            [1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1],
+            [1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+            [1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+]
 
 
-        self.map = self.map_2
+
+        self.map = self.map_3
 
         self.player = Player()
         self.tiles = []
@@ -90,22 +105,15 @@ class Level:
     def cast_ray(self, canvas: pygame.Surface, player, color, angle) -> None:
         """ draw a line to next wall, use player.angle """
 
-        # avoid undef tangent
-        if abs(math.cos(angle)) < 1e-10:
-            return
-
         # calc tangent
         try:
             invert_tangent = (1/math.tan(angle))
         except ZeroDivisionError:
-            invert_tangent = 1
+            invert_tangent = 0
 
         # get nearest line
         initial_pos_y = round(player.rect.centery / settings.TILE_SIZE) * settings.TILE_SIZE
         initial_pos_x = round(player.rect.centerx / settings.TILE_SIZE) * settings.TILE_SIZE
-
-        # the ray goes max 10 * settings.TILE_SIZE if no wall are found.
-        # this loop should be break in a normal use
 
         # vertical rays
         for i in range(1, settings.MAX_RAY_DISTANCE):
@@ -118,8 +126,6 @@ class Level:
                 map_index_x = min(int(max(vertical_end_pos_x / settings.TILE_SIZE, 0)), len(self.map[0]) - 1)
             # looking up
             elif math.pi < angle and angle < 2 * math.pi:
-                if angle == 3 * (math.pi/2):
-                    print('yep')
                 vertical_end_pos_y = initial_pos_y - (settings.TILE_SIZE * i)
                 vertical_end_pos_x = player.rect.centerx - (invert_tangent * abs(vertical_end_pos_y - player.rect.centery))
                 # clamp map indexs to map size
@@ -153,7 +159,7 @@ class Level:
         try:
             invert_tangent = math.tan(angle)
         except ZeroDivisionError:
-            invert_tangent = 0.01
+            invert_tangent = 0
 
         # horizontal rays
         for i in range(1, settings.MAX_RAY_DISTANCE):
