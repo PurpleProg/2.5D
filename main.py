@@ -81,7 +81,8 @@ class Game:
         """ render the level """
         self.display.fill(settings.BACKGROUND_COLOR)
 
-        self.level.render(self.display)
+        # self.level.render_2D(self.display)
+        self.level.render_3D(self.display)
 
         pygame.display.flip()
         self.clock.tick(settings.FPS)

@@ -9,7 +9,7 @@ class Level:
     """ handle map and raycasting """
     # pylint: disable=C0301
     def __init__(self) -> None:
-        self.map_0: list[list[int]] = [
+        self.map_empty: list[list[int]] = [
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
@@ -36,18 +36,18 @@ class Level:
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
         ]
-        self.map_1: list[list[int]] = [
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
-            [1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1,],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
-            [1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1,],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
-            [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1,],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
+        self.map_little: list[list[int]] = [
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,],
+            [1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1,],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,],
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,],
         ]
-        self.map_2: list[list[int]] = [
+        self.map_wall_all_around: list[list[int]] = [
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,],
             [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,],
             [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,],
@@ -80,7 +80,7 @@ class Level:
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
         ]
 
-        self.map = self.map_3
+        self.map = self.map_little
 
         self.player = Player()
         self.tiles = []
@@ -260,8 +260,8 @@ class Level:
             return vertical_end_pos_x, vertical_end_pos_y
         return horizontal_end_pos_x, horizontal_end_pos_y
 
-    def render(self, canvas: pygame.Surface) -> None:
-        """ blit tiles to a canvas render player"""
+    def render_2D(self, canvas: pygame.Surface) -> None:
+        """ 2D, blit tiles to a canvas render player"""
         # blit tiles
         for tile in self.tiles:
             tile.render(canvas=canvas)
@@ -291,6 +291,35 @@ class Level:
                     player=self.player,
                     angle=self.player.angle
                 )),
+            )
+
+    def render_3D(self, canvas: pygame.Surface) -> None:
+        """ 3D, draw vertical line for each rays"""
+        for ray_index in range(settings.FOV):
+            angle = self.player.angle + math.radians(ray_index - (settings.FOV / 2))
+            ray_x, ray_y = self.cast_ray(
+                player=self.player,
+                angle=angle
+            )
+
+            ray_len = math.sqrt(
+                abs(self.player.rect.x - ray_x) ** 2 +
+                abs(self.player.rect.y - ray_y) ** 2
+            )
+
+            line_height = (settings.HEIGHT * settings.TILE_SIZE) / ray_len
+
+            start_y = (settings.HEIGHT - line_height) / 2
+            end_y = start_y + line_height
+
+            x = ray_index * (settings.WIDTH / settings.FOV)
+
+            pygame.draw.line(
+                surface=canvas,
+                color=settings.RAY_COLOR,
+                start_pos=(x, start_y),
+                end_pos=(x, end_y),
+                width=math.ceil(settings.WIDTH / settings.FOV),
             )
 
 

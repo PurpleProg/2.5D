@@ -9,7 +9,7 @@ PLAYER_SIZE = 64
 PLAYER_SPEED = 5
 
 # tile
-TILE_SIZE = 32
+TILE_SIZE = 64
 GRID_GAP = 1
 
 # Rays
