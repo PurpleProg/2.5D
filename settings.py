@@ -13,7 +13,7 @@ TILE_SIZE = 32
 GRID_GAP = 1
 
 # Rays
-RAYS = 180   # number of rays casted per frame
+FOV = 90   # number of rays casted per frame
 MAX_RAY_DISTANCE = 20  # in tile_size
 
 ################ COLORS ###################

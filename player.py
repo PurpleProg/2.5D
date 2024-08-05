@@ -9,48 +9,33 @@ class Player:
     def __init__(self) -> None:
         self.image = pygame.Surface(size=(settings.PLAYER_SIZE, settings.PLAYER_SIZE))
         self.image.fill(settings.PLAYER_COLOR)
-        self.rect = self.image.get_rect()
-        self.rect.x = 100
-        self.rect.y = 100
+        # i wont refractor all the raycaster self.rect is a Frect
+        self.rect: pygame.FRect = self.image.get_frect()
+        self.rect.x = 128.0
+        self.rect.y = 128.0
 
         self.speed = settings.PLAYER_SPEED
-        self.direction = pygame.Vector2(0, 0)   # this is only used for moving
 
         self.angle = 3 * (math.pi / 2) + 0.5 # in radian this is used for raycast
 
     def update(self, keys: set) -> None:
         """" move the player and change angle"""
-        if 'RIGHT' in keys:
-            self.direction.x = 1
-        elif "LEFT" in keys:
-            self.direction.x = -1
-        else:
-            self.direction.x = 0
 
+        # move player
         if 'UP' in keys:
-            self.direction.y = -1
+            self.rect.x += math.cos(self.angle) * self.speed
+            self.rect.y += math.sin(self.angle) * self.speed
         elif 'DOWN' in keys:
-            self.direction.y = 1
-        else:
-            self.direction.y = 0
+            self.rect.x += math.cos(self.angle + math.pi) * self.speed
+            self.rect.y += math.sin(self.angle + math.pi) * self.speed
 
-        if self.direction.length():
-            self.direction.normalize_ip()
-
-        self.rect.x += self.speed * self.direction.x
-        self.rect.y += self.speed * self.direction.y
-
-        # angle
-        if 'a' in keys:
-            self.angle -= 0.05
-        elif 'd' in keys:
+        # change angle
+        if 'RIGHT' in keys:
             self.angle += 0.05
-
-        # normalize angle
-        if self.angle <= 0:
-            self.angle += 2 * math.pi
-        elif self.angle >= 2 * math.pi:
-            self.angle -= 2 * math.pi
+        elif 'LEFT' in keys:
+            self.angle -= 0.05
+        if 'a' in keys:
+            self.angle = 0
 
     def render(self, canvas: pygame.Surface) -> None:
         """ draw player to screen """

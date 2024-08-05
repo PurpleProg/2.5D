@@ -73,7 +73,6 @@ class Game:
                         case pygame.K_d:
                             self.keys.remove('d')
 
-
     def update(self) -> None:
         """ update the level """
         self.level.update(self.keys)
