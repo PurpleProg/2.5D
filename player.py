@@ -2,18 +2,19 @@
 import math
 import pygame
 from utils import draw_line
+import settings
 
 
 class Player:
     """ player, used to posision the camera """
     def __init__(self) -> None:
-        self.image = pygame.Surface(size=(64, 64))
-        self.image.fill('#ffff00')
+        self.image = pygame.Surface(size=(settings.PLAYER_SIZE, settings.PLAYER_SIZE))
+        self.image.fill(settings.PLAYER_COLOR)
         self.rect = self.image.get_rect()
         self.rect.x = 100
         self.rect.y = 100
 
-        self.speed = 5
+        self.speed = settings.PLAYER_SPEED
         self.direction = pygame.Vector2(0, 0)   # this is only used for moving
 
         self.angle = 3 * (math.pi / 2) + 0.5 # in radian this is used for raycast
@@ -62,6 +63,6 @@ class Player:
             start_pos=self.rect.center,
             lengh=30,
             angle=self.angle,
-            color='#ffff00',
+            color=settings.PLAYER_COLOR,
             width=5,
         )

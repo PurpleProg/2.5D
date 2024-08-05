@@ -1,12 +1,13 @@
 """ little piece of code to help clarify and simplify the project """
 import math
 import pygame
+import settings
 
 
 class Tile:
     """ container for a basic tile """
     def __init__(self, color) -> None:
-        self.size = 63
+        self.size = settings.TILE_SIZE - settings.GRID_GAP
         self.color = color
         self.image = pygame.Surface(size=(self.size, self.size))
         self.image.fill(self.color)

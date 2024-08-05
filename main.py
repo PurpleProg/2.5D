@@ -4,6 +4,7 @@ Licence: GPL-3+
 import sys
 import pygame
 from level import Level
+import settings
 
 
 class Game:
@@ -12,13 +13,11 @@ class Game:
         pygame.init()
 
         # init display
-        self.display: pygame.Surface = pygame.display.set_mode(size=(1024, 512))
-        # self.display = pygame.display.set_mode(size=(1024, 512), flags=pygame.FULLSCREEN)
+        self.display: pygame.Surface = pygame.display.set_mode(size=(settings.WIDTH, settings.HEIGHT))
         pygame.display.set_caption('2.5D engine')
 
         # clock for fps
         self.clock = pygame.Clock()
-        self.fps = 60
 
         self.level = Level()
         self.keys: set[str] = set()
@@ -79,12 +78,12 @@ class Game:
 
     def render(self) -> None:
         """ render the level """
-        self.display.fill('#000000')
+        self.display.fill(settings.BACKGROUND_COLOR)
 
         self.level.render(self.display)
 
         pygame.display.flip()
-        self.clock.tick(self.fps)
+        self.clock.tick(settings.FPS)
 
 
 def main() -> None:
