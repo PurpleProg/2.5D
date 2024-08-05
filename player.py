@@ -16,7 +16,7 @@ class Player:
         self.speed = 5
         self.direction = pygame.Vector2(0, 0)   # this is only used for moving
 
-        self.angle = 3 * (math.pi / 2) + 0.01 # in radian this is used for raycast
+        self.angle = 3 * (math.pi / 2) + 0.5 # in radian this is used for raycast
 
     def update(self, keys: set) -> None:
         """" move the player and change angle"""
