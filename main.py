@@ -13,7 +13,9 @@ class Game:
         pygame.init()
 
         # init display
-        self.display: pygame.Surface = pygame.display.set_mode(size=(settings.WIDTH, settings.HEIGHT))
+        self.display: pygame.Surface = pygame.display.set_mode(
+            size=(settings.WIDTH, settings.HEIGHT)
+        )
         pygame.display.set_caption('2.5D engine')
 
         # clock for fps

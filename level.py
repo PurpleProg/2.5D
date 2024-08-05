@@ -102,12 +102,12 @@ class Level:
         """ update the player """
         self.player.update(keys=keys)
 
-    def cast_ray(self, canvas: pygame.Surface, player, color, angle) -> None:
+    def cast_ray(self, player, angle) -> tuple[int, int]:
         """ draw a line to next wall, use player.angle """
 
         # calc tangent
         try:
-            invert_tangent = (1/math.tan(angle))
+            invert_tangent = 1/math.tan(angle)
         except ZeroDivisionError:
             invert_tangent = 0
 
@@ -120,17 +120,33 @@ class Level:
             # looking down
             if 0 < angle and angle < math.pi:
                 vertical_end_pos_y = initial_pos_y + (settings.TILE_SIZE * i)
-                vertical_end_pos_x = player.rect.centerx + (invert_tangent * abs(vertical_end_pos_y - player.rect.centery))
+                vertical_end_pos_x = player.rect.centerx + (
+                    invert_tangent * abs(vertical_end_pos_y - player.rect.centery)
+                )
                 # clamp map indexs to map size
-                map_index_y = min(int(max(vertical_end_pos_y / settings.TILE_SIZE, 0)), len(self.map) - 1)
-                map_index_x = min(int(max(vertical_end_pos_x / settings.TILE_SIZE, 0)), len(self.map[0]) - 1)
+                map_index_y = min(
+                    int(max(vertical_end_pos_y / settings.TILE_SIZE, 0)),
+                    len(self.map) - 1
+                )
+                map_index_x = min(
+                    int(max(vertical_end_pos_x / settings.TILE_SIZE, 0)),
+                    len(self.map[0]) - 1
+                )
             # looking up
             elif math.pi < angle and angle < 2 * math.pi:
                 vertical_end_pos_y = initial_pos_y - (settings.TILE_SIZE * i)
-                vertical_end_pos_x = player.rect.centerx - (invert_tangent * abs(vertical_end_pos_y - player.rect.centery))
+                vertical_end_pos_x = player.rect.centerx - (
+                    invert_tangent * abs(vertical_end_pos_y - player.rect.centery)
+                )
                 # clamp map indexs to map size
-                map_index_y = min(int(max(vertical_end_pos_y / settings.TILE_SIZE, 0)), len(self.map) - 1) -1
-                map_index_x = min(int(max(vertical_end_pos_x / settings.TILE_SIZE, 0)), len(self.map[0]) - 1)
+                map_index_y = min(
+                    int(max(vertical_end_pos_y / settings.TILE_SIZE, 0)),
+                    len(self.map) - 1
+                ) -1
+                map_index_x = min(
+                    int(max(vertical_end_pos_x / settings.TILE_SIZE, 0)),
+                    len(self.map[0]) - 1
+                )
             # looking strait to the sides
             else:
                 # left
@@ -145,11 +161,20 @@ class Level:
                 else:
                     print('unhandle angle')
                 # clamp map indexs to map size
-                map_index_y = min(int(max(vertical_end_pos_y / settings.TILE_SIZE, 0)), len(self.map) - 1)
-                map_index_x = min(int(max(vertical_end_pos_x / settings.TILE_SIZE, 0)), len(self.map[0]) - 1)
+                map_index_y = min(
+                    int(max(vertical_end_pos_y / settings.TILE_SIZE, 0)),
+                    len(self.map) - 1
+                )
+                map_index_x = min(
+                    int(max(vertical_end_pos_x / settings.TILE_SIZE, 0)),
+                    len(self.map[0]) - 1
+                )
 
             # get the ray lengh (pytagore)
-            vertical_lengh = (abs(player.rect.x - vertical_end_pos_x) ** 2) + (abs(player.rect.y - vertical_end_pos_y) ** 2)
+            vertical_lengh = (
+                (abs(player.rect.x - vertical_end_pos_x) ** 2) +
+                (abs(player.rect.y - vertical_end_pos_y) ** 2)
+            )
 
             # find collision with walls
             if self.map[map_index_y][map_index_x]:
@@ -166,17 +191,33 @@ class Level:
             # looking right
             if 3 * (math.pi / 2) < angle or angle < math.pi / 2:
                 horizontal_end_pos_x = initial_pos_x + (settings.TILE_SIZE * i)
-                horizontal_end_pos_y = player.rect.centery + (invert_tangent * abs(horizontal_end_pos_x - player.rect.centerx))
+                horizontal_end_pos_y = player.rect.centery + (
+                    invert_tangent * abs(horizontal_end_pos_x - player.rect.centerx)
+                )
                 # clamp map indexs to map size
-                map_index_x = min(int(max(horizontal_end_pos_x / settings.TILE_SIZE, 0)), len(self.map[0]) - 1)
-                map_index_y = min(int(max(horizontal_end_pos_y / settings.TILE_SIZE, 0)), len(self.map) - 1)
+                map_index_x = min(
+                    int(max(horizontal_end_pos_x / settings.TILE_SIZE, 0)),
+                    len(self.map[0]) - 1
+                )
+                map_index_y = min(
+                    int(max(horizontal_end_pos_y / settings.TILE_SIZE, 0)),
+                    len(self.map) - 1
+                )
             # looking left
             elif math.pi / 2 < angle and angle < 3 * (math.pi / 2):
                 horizontal_end_pos_x = initial_pos_x - (settings.TILE_SIZE * i)
-                horizontal_end_pos_y = player.rect.centery - (invert_tangent * abs(horizontal_end_pos_x - player.rect.centerx))
+                horizontal_end_pos_y = player.rect.centery - (
+                    invert_tangent * abs(horizontal_end_pos_x - player.rect.centerx)
+                )
                 # clamp map indexs to map size
-                map_index_x = min(int(max(horizontal_end_pos_x / settings.TILE_SIZE, 0)), len(self.map[0]) - 1) -1
-                map_index_y = min(int(max(horizontal_end_pos_y / settings.TILE_SIZE, 0)), len(self.map) - 1)
+                map_index_x = min(
+                    int(max(horizontal_end_pos_x / settings.TILE_SIZE, 0)),
+                    len(self.map[0]) - 1
+                ) -1
+                map_index_y = min(
+                    int(max(horizontal_end_pos_y / settings.TILE_SIZE, 0)),
+                    len(self.map) - 1
+                )
             # looking strait to the sides
             else:
                 # up
@@ -190,8 +231,14 @@ class Level:
                 else:
                     print('unhandle angle')
                 # clamp map indexs to map size
-                map_index_y = min(int(max(horizontal_end_pos_y / settings.TILE_SIZE, 0)), len(self.map) - 1)
-                map_index_x = min(int(max(horizontal_end_pos_x / settings.TILE_SIZE, 0)), len(self.map[0]) - 1)
+                map_index_y = min(
+                    int(max(horizontal_end_pos_y / settings.TILE_SIZE, 0)),
+                    len(self.map) - 1
+                )
+                map_index_x = min(
+                    int(max(horizontal_end_pos_x / settings.TILE_SIZE, 0)),
+                    len(self.map[0]) - 1
+                )
 
             # get the ray lengh (pytagore)
             horizontal_lengh = (
@@ -204,19 +251,9 @@ class Level:
                 break
 
         if vertical_lengh <= horizontal_lengh:
-            pygame.draw.line(
-                surface=canvas,
-                color=color,
-                start_pos=player.rect.center,
-                end_pos=(vertical_end_pos_x, vertical_end_pos_y),
-            )
+            return vertical_end_pos_x, vertical_end_pos_y
         else:
-            pygame.draw.line(
-                surface=canvas,
-                color=color,
-                start_pos=player.rect.center,
-                end_pos=(horizontal_end_pos_x, horizontal_end_pos_y),
-            )
+            return horizontal_end_pos_x, horizontal_end_pos_y
 
     def render(self, canvas: pygame.Surface) -> None:
         """ blit tiles to a canvas render player"""
@@ -226,19 +263,21 @@ class Level:
 
         # all rays
         for angle in range(settings.RAYS):
-            self.cast_ray(
-                canvas=canvas,
+            x, y = self.cast_ray(
                 player=self.player,
-                color=settings.RAY_COLOR,
                 angle=math.radians(angle * (360/settings.RAYS))
+            )
+            pygame.draw.line(
+                surface=canvas,
+                color=settings.RAY_COLOR,
+                start_pos=self.player.rect.center,
+                end_pos=(x, y),
             )
 
         self.player.render(canvas=canvas)
 
         # direction ray
-        self.cast_ray(
-            canvas=canvas,
-            player=self.player,
-            color=settings.RAY_DIRECTION_COLOR,
-            angle=self.player.angle
-        )
+        # self.cast_ray(
+        #     player=self.player,
+        #     angle=self.player.angle
+        # )

@@ -1,7 +1,6 @@
 """ player class """
 import math
 import pygame
-from utils import draw_line
 import settings
 
 
@@ -56,13 +55,3 @@ class Player:
     def render(self, canvas: pygame.Surface) -> None:
         """ draw player to screen """
         canvas.blit(self.image, self.rect)
-
-        # show agle
-        draw_line(
-            canvas=canvas,
-            start_pos=self.rect.center,
-            lengh=30,
-            angle=self.angle,
-            color=settings.PLAYER_COLOR,
-            width=5,
-        )

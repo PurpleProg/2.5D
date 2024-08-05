@@ -1,5 +1,4 @@
 """ little piece of code to help clarify and simplify the project """
-import math
 import pygame
 import settings
 
@@ -19,27 +18,3 @@ class Tile:
                 source=self.image,
                 dest=self.rect
             )
-
-
-def draw_line(
-    canvas: pygame.Surface,
-    start_pos: tuple[int, int],
-    lengh: int,
-    angle: float,
-    color,
-    width: int=1
-    ) -> None:
-    """ draw a line from a size and a angle in radians """
-    # i hate trigonometry
-    end_pos_x = start_pos[0] + (math.cos(angle) * lengh)
-    end_pos_y = start_pos[1] + (math.sin(angle) * lengh)
-    pygame.draw.line(
-            surface=canvas,
-            start_pos=start_pos,
-            end_pos=(
-                end_pos_x,
-                end_pos_y
-            ),
-            color=color,
-            width=width
-        )

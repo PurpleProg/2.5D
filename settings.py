@@ -1,3 +1,5 @@
+""" contain global constants """
+
 WIDTH, HEIGHT = 1024, 512
 
 FPS = 60
