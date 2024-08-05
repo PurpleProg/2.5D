@@ -7,7 +7,7 @@ from utils import draw_line
 class Player:
     """ player, used to posision the camera """
     def __init__(self) -> None:
-        self.image = pygame.Surface(size=(16, 16))
+        self.image = pygame.Surface(size=(64, 64))
         self.image.fill('#ffff00')
         self.rect = self.image.get_rect()
         self.rect.x = 100
