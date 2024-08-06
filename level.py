@@ -75,7 +75,7 @@ class Level:
             [1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
             [1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1],
             [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1],
+            [1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1],
             [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
             [1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1],
             [1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1],
@@ -89,6 +89,12 @@ class Level:
 
         self.player = Player()
         self.tiles = []
+
+        # background
+        self.floor = pygame.Surface(size=(settings.WIDTH, settings.HEIGHT//2))
+        self.floor.fill(color=settings.FLOOR_COLOR)
+        self.sky = pygame.Surface(size=(settings.WIDTH, settings.HEIGHT//2))
+        self.sky.fill(settings.SKY_COLOR)
 
         # create tiles for 2D rendering only
         for y, column in enumerate(self.map):
@@ -175,8 +181,8 @@ class Level:
                     len(self.map[0]) - 1
                 )
 
-            # get the ray lengh (pytagore)
-            vertical_lengh = (
+            # get the ray squared lengh (pytagore)
+            vertical_lengh_squared = (
                 ((player.rect.x - vertical_end_pos_x)** 2) +
                 ((player.rect.y - vertical_end_pos_y) ** 2)
             )
@@ -185,7 +191,7 @@ class Level:
             if self.map[map_index_y][map_index_x]:
                 break
 
-        return vertical_end_pos_x, vertical_end_pos_y, vertical_lengh
+        return vertical_end_pos_x, vertical_end_pos_y, vertical_lengh_squared
 
     def cast_horizontal_ray(self, player, angle) -> tuple[int, int, int]:
         """ calc a line to the nearest horizontal wall """
@@ -322,6 +328,18 @@ class Level:
     # pylint: disable=invalid-name
     def render_3D(self, canvas: pygame.Surface) -> None:
         """ 3D, draw vertical line for each rays"""
+
+        # draw floor and sky
+        canvas.blit(
+            source=self.floor,
+            dest=(0, settings.HEIGHT//2)
+        )
+        canvas.blit(
+            source=self.sky,
+            dest=(0, 0)
+        )
+
+        # draw walls
         for ray_index in range((settings.FOV*settings.RESOLUTION_MULTIPLIER) + 1):
             # get ray angle
             player_angle_normalized = self.normalize_angle(self.player.angle)
@@ -342,33 +360,42 @@ class Level:
                 angle=ray_angle,
             )
 
-            # check shortest ray by squared len
+            angle_diff = self.normalize_angle(ray_angle - player_angle_normalized)
+
+            # get shortest ray by squared len
             if vertical_ray_len_squared <= horizontal_ray_len_squared:
                 ray_x = vertical_ray_x
                 ray_y = vertical_ray_y
                 ray_len_squared = vertical_ray_len_squared
+                # print(f'angle:{ray_angle}, cos:{math.cos(ray_angle)}')
+                ray_len = (
+                    (self.player.rect.y - ray_y) / math.cos(self.normalize_angle(ray_angle - (math.pi/2)))
+                )
                 ray_color = settings.RAY_COLOR_VERTICAL
             else:
                 ray_x = horizontal_ray_x
                 ray_y = horizontal_ray_y
                 ray_len_squared = horizontal_ray_len_squared
+                ray_len = (
+                    (self.player.rect.x - ray_x) / math.cos(ray_angle)
+                )
                 ray_color = settings.RAY_COLOR_HORIZONTAL
-
-            # get ray len
-            ray_len = math.sqrt(ray_len_squared)
-
-            angle_diff = self.normalize_angle(ray_angle - player_angle_normalized)
 
             # fix fisheye effect
             ray_len *= math.cos(angle_diff)
-            line_height = (settings.HEIGHT * settings.TILE_SIZE) / ray_len
+            line_height = min(
+                ((settings.HEIGHT * settings.TILE_SIZE) / ray_len),
+                settings.HEIGHT,
+            )
 
             # center the lines
             start_y = (settings.HEIGHT - line_height) / 2
             end_y = start_y + line_height
 
+            # get x posision
             x = (ray_index/settings.RESOLUTION_MULTIPLIER) * (settings.WIDTH / settings.FOV)
 
+            # draw a vertical line for each ray
             pygame.draw.line(
                 surface=canvas,
                 color=ray_color,
