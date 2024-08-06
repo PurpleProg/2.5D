@@ -5,15 +5,15 @@ WIDTH, HEIGHT = 1024, 512
 FPS = 60
 
 # player
-PLAYER_SIZE = 8
-PLAYER_SPEED = 5
+PLAYER_SIZE = 16
+PLAYER_SPEED = 2
 
 # tile
-TILE_SIZE = 64
+TILE_SIZE = 32
 GRID_GAP = 1
 
 # Rays
-RESOLUTION_MULTIPLIER = 2
+RESOLUTION_MULTIPLIER = 10
 FOV = 90   # number of rays casted per frame
 MAX_RAY_DISTANCE = 20  # in tile_size
 RAY_MIN_DISTANCE = 0   # should be 0 or 1
