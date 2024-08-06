@@ -105,8 +105,8 @@ class Level:
         """ update the player """
         self.player.update(keys=keys)
 
-    def cast_ray(self, player, angle) -> tuple[int, int, str]:
-        """ draw a line to next wall, use player.angle """
+    def cast_vertical_ray(self, player, angle) -> tuple[int, int, int]:
+        """ calc line to the nearest vertical wall """
 
         angle = self.normalize_angle(angle=angle)
 
@@ -177,13 +177,20 @@ class Level:
 
             # get the ray lengh (pytagore)
             vertical_lengh = (
-                (abs(player.rect.x - vertical_end_pos_x) ** 2) +
-                (abs(player.rect.y - vertical_end_pos_y) ** 2)
+                ((player.rect.x - vertical_end_pos_x)** 2) +
+                ((player.rect.y - vertical_end_pos_y) ** 2)
             )
 
             # find collision with walls
             if self.map[map_index_y][map_index_x]:
                 break
+
+        return vertical_end_pos_x, vertical_end_pos_y, vertical_lengh
+
+    def cast_horizontal_ray(self, player, angle) -> tuple[int, int, int]:
+        """ calc a line to the nearest horizontal wall """
+
+        angle = self.normalize_angle(angle=angle)
 
         # calc tangent
         try:
@@ -259,10 +266,7 @@ class Level:
             if self.map[map_index_y][map_index_x]:
                 break
 
-        # check shortest ray
-        if vertical_lengh <= horizontal_lengh:
-            return vertical_end_pos_x, vertical_end_pos_y, settings.RAY_COLOR_VERTICAL
-        return horizontal_end_pos_x, horizontal_end_pos_y, settings.RAY_COLOR_HORIZONTAL
+        return horizontal_end_pos_x, horizontal_end_pos_y, horizontal_lengh
 
     def normalize_angle(self, angle: float) -> float:
         """ normalize angle ( in radian ) in 0, 2pi
@@ -285,56 +289,75 @@ class Level:
 
         # all rays
         for ray_index in range(settings.FOV):
-            angle = self.player.angle + math.radians(ray_index - (settings.FOV / 2))
-            x, y, color = self.cast_ray(
+            ray_angle = self.player.angle + math.radians(ray_index - (settings.FOV / 2))
+
+            # get vertical ray
+            vertical_ray_x, vertical_ray_y, vertical_ray_len_squared = self.cast_vertical_ray(
                 player=self.player,
-                angle=angle
+                angle=ray_angle
             )
+
+            # get horizontal ray
+            horizontal_ray_x, horizontal_ray_y, horizontal_ray_len_squared = self.cast_horizontal_ray(
+                player=self.player,
+                angle=ray_angle,
+            )
+
+            # check shortest ray by squared len
+            if vertical_ray_len_squared <= horizontal_ray_len_squared:
+                ray_x, ray_y, ray_color = vertical_ray_x, vertical_ray_y, settings.RAY_COLOR_VERTICAL
+            else:
+                ray_x, ray_y, ray_color = horizontal_ray_x, horizontal_ray_y, settings.RAY_COLOR_HORIZONTAL
+
             pygame.draw.line(
                 surface=canvas,
-                color=color,
+                color=ray_color,
                 start_pos=self.player.rect.center,
-                end_pos=(x, y),
+                end_pos=(ray_x, ray_y),
             )
 
         self.player.render(canvas=canvas)
 
-        # direction ray
-        x, y, color = self.cast_ray(
-            player=self.player,
-            angle=self.player.angle
-        )
-        pygame.draw.line(
-                surface=canvas,
-                color=settings.RAY_DIRECTION_COLOR,
-                start_pos=(self.player.rect.centerx + settings.WIDTH, self.player.rect.centery),
-                end_pos=(x + settings.WIDTH, y),
-            )
 
     # pylint: disable=invalid-name
     def render_3D(self, canvas: pygame.Surface) -> None:
         """ 3D, draw vertical line for each rays"""
         for ray_index in range((settings.FOV*settings.RESOLUTION_MULTIPLIER) + 1):
-            # get angles
+            # get ray angle
             player_angle_normalized = self.normalize_angle(self.player.angle)
             ray_angle = self.normalize_angle(
                 player_angle_normalized +
                 math.radians((ray_index/settings.RESOLUTION_MULTIPLIER) - (settings.FOV/2))
             )
 
-            # get ray
-            ray_x, ray_y, ray_color = self.cast_ray(
+            # get vertical ray
+            vertical_ray_x, vertical_ray_y, vertical_ray_len_squared = self.cast_vertical_ray(
                 player=self.player,
                 angle=ray_angle
             )
 
-            ray_len = math.sqrt(
-                (self.player.rect.x - ray_x) ** 2 +
-                (self.player.rect.y - ray_y) ** 2
+            # get horizontal ray
+            horizontal_ray_x, horizontal_ray_y, horizontal_ray_len_squared = self.cast_horizontal_ray(
+                player=self.player,
+                angle=ray_angle,
             )
 
-            angle_diff = self.normalize_angle(ray_angle - player_angle_normalized)
+            # check shortest ray by squared len
+            if vertical_ray_len_squared <= horizontal_ray_len_squared:
+                ray_x = vertical_ray_x
+                ray_y = vertical_ray_y
+                ray_len_squared = vertical_ray_len_squared
+                ray_color = settings.RAY_COLOR_VERTICAL
+            else:
+                ray_x = horizontal_ray_x
+                ray_y = horizontal_ray_y
+                ray_len_squared = horizontal_ray_len_squared
+                ray_color = settings.RAY_COLOR_HORIZONTAL
 
+            # get ray len
+            ray_len = math.sqrt(ray_len_squared)
+
+            angle_diff = self.normalize_angle(ray_angle - player_angle_normalized)
 
             # fix fisheye effect
             ray_len *= math.cos(angle_diff)
@@ -350,7 +373,7 @@ class Level:
                 surface=canvas,
                 color=ray_color,
                 start_pos=(x, start_y),
-                end_pos=(x, end_y), 
+                end_pos=(x, end_y),
                 width=math.ceil(settings.WIDTH / (settings.FOV*settings.RESOLUTION_MULTIPLIER)),
             )
 
