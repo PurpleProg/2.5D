@@ -100,7 +100,7 @@ class Level:
         """ update the player """
         self.player.update(keys=keys)
 
-    def cast_ray(self, player, angle) -> tuple[int, int]:
+    def cast_ray(self, player, angle) -> tuple[int, int, str]:
         """ draw a line to next wall, use player.angle """
 
         angle = self.normalize_angle(angle=angle)
@@ -268,6 +268,8 @@ class Level:
             angle -= 2 * math.pi
         return angle
 
+    # i know the D is capital
+    # pylint: disable=invalid-name
     def render_2D(self, canvas: pygame.Surface) -> None:
         """ 2D, blit tiles to a canvas render player"""
         canvas.fill(settings.BACKGROUND_COLOR)
@@ -304,6 +306,7 @@ class Level:
                 end_pos=(x + settings.WIDTH, y),
             )
 
+    # pylint: disable=invalid-name
     def render_3D(self, canvas: pygame.Surface) -> None:
         """ 3D, draw vertical line for each rays"""
         for ray_index in range(settings.FOV + 1):
