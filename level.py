@@ -270,6 +270,8 @@ class Level:
 
     def render_2D(self, canvas: pygame.Surface) -> None:
         """ 2D, blit tiles to a canvas render player"""
+        canvas.fill(settings.BACKGROUND_COLOR)
+
         # blit tiles
         for tile in self.tiles:
             tile.render(canvas=canvas)
@@ -284,8 +286,8 @@ class Level:
             pygame.draw.line(
                 surface=canvas,
                 color=color,
-                start_pos=(self.player.rect.centerx + settings.WIDTH, self.player.rect.centery),
-                end_pos=(x + settings.WIDTH, y),
+                start_pos=self.player.rect.center,
+                end_pos=(x, y),
             )
 
         self.player.render(canvas=canvas)
@@ -358,5 +360,5 @@ class Tile:
         """ blit """
         canvas.blit(
                 source=self.image,
-                dest=(self.rect.x + settings.WIDTH, self.rect.y)
+                dest=self.rect
             )

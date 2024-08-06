@@ -14,9 +14,13 @@ class Game:
 
         # init display
         self.display: pygame.Surface = pygame.display.set_mode(
-            size=(settings.WIDTH+700, settings.HEIGHT)
+            size=(settings.WIDTH, settings.HEIGHT)
         )
         pygame.display.set_caption('2.5D engine')
+
+        self.minimap = pygame.Surface(
+            size=(settings.WIDTH, settings.HEIGHT)
+        )
 
         # clock for fps
         self.clock = pygame.Clock()
@@ -81,8 +85,18 @@ class Game:
         """ render the level """
         self.display.fill(settings.BACKGROUND_COLOR)
 
-        self.level.render_2D(self.display)
         self.level.render_3D(self.display)
+
+        # render a 2D minimap
+        self.level.render_2D(self.minimap)
+        minimap = pygame.transform.scale_by(
+            surface=self.minimap,
+            factor=(1/4),
+        )
+        self.display.blit(
+            source=minimap,
+            dest=(0, 0)
+        )
 
         pygame.display.flip()
         self.clock.tick(settings.FPS)
