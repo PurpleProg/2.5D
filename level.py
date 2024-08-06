@@ -327,8 +327,8 @@ class Level:
 
 
             # fix fisheye effect
+            ray_len *= math.cos(angle_diff)
             line_height = (settings.HEIGHT * settings.TILE_SIZE) / ray_len
-            line_height *= math.cos(angle_diff)
 
             # center the lines
             start_y = (settings.HEIGHT - line_height) / 2
