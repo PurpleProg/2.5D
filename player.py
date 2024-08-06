@@ -43,4 +43,4 @@ class Player:
 
     def render(self, canvas: pygame.Surface) -> None:
         """ draw player to screen """
-        canvas.blit(self.image, self.rect)
+        canvas.blit(source=self.image, dest=(self.rect.x + settings.WIDTH, self.rect.y))

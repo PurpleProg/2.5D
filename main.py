@@ -14,7 +14,7 @@ class Game:
 
         # init display
         self.display: pygame.Surface = pygame.display.set_mode(
-            size=(settings.WIDTH, settings.HEIGHT)
+            size=(settings.WIDTH+700, settings.HEIGHT)
         )
         pygame.display.set_caption('2.5D engine')
 
@@ -81,7 +81,7 @@ class Game:
         """ render the level """
         self.display.fill(settings.BACKGROUND_COLOR)
 
-        # self.level.render_2D(self.display)
+        self.level.render_2D(self.display)
         self.level.render_3D(self.display)
 
         pygame.display.flip()

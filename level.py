@@ -103,12 +103,7 @@ class Level:
     def cast_ray(self, player, angle) -> tuple[int, int]:
         """ draw a line to next wall, use player.angle """
 
-        # normalize angle
-        if angle < 0:
-            angle += 2 * math.pi
-        else:
-            while angle > 2 * math.pi:
-                angle -= 2 * math.pi
+        angle = self.normalize_angle(angle=angle)
 
         # calc tangent
         try:
@@ -116,14 +111,12 @@ class Level:
         except ZeroDivisionError:
             invert_tangent = 0
 
-        # get nearest line
-        initial_pos_y = round(player.rect.centery / settings.TILE_SIZE) * settings.TILE_SIZE
-        initial_pos_x = round(player.rect.centerx / settings.TILE_SIZE) * settings.TILE_SIZE
-
         # vertical rays
-        for i in range(1, settings.MAX_RAY_DISTANCE):
+        for i in range(settings.RAY_MIN_DISTANCE, settings.MAX_RAY_DISTANCE):
             # looking down
             if 0 < angle < math.pi:
+                initial_pos_y = math.ceil(player.rect.centery / settings.TILE_SIZE) * settings.TILE_SIZE
+
                 vertical_end_pos_y = initial_pos_y + (settings.TILE_SIZE * i)
                 vertical_end_pos_x = player.rect.centerx + (
                     invert_tangent * abs(vertical_end_pos_y - player.rect.centery)
@@ -139,6 +132,8 @@ class Level:
                 )
             # looking up
             elif math.pi < angle < 2 * math.pi:
+                initial_pos_y = math.floor(player.rect.centery / settings.TILE_SIZE) * settings.TILE_SIZE
+
                 vertical_end_pos_y = initial_pos_y - (settings.TILE_SIZE * i)
                 vertical_end_pos_x = player.rect.centerx - (
                     invert_tangent * abs(vertical_end_pos_y - player.rect.centery)
@@ -192,9 +187,12 @@ class Level:
             tangent = 0
 
         # horizontal rays
-        for i in range(1, settings.MAX_RAY_DISTANCE):
+        for i in range(settings.RAY_MIN_DISTANCE, settings.MAX_RAY_DISTANCE):
             # looking right
             if 3 * (math.pi / 2) < angle or angle < math.pi / 2:
+                # get nearest line
+                initial_pos_x = math.ceil(player.rect.centerx / settings.TILE_SIZE) * settings.TILE_SIZE
+
                 horizontal_end_pos_x = initial_pos_x + (settings.TILE_SIZE * i)
                 horizontal_end_pos_y = player.rect.centery + (
                     tangent * abs(horizontal_end_pos_x - player.rect.centerx)
@@ -210,6 +208,7 @@ class Level:
                 )
             # looking left
             elif math.pi / 2 < angle < 3 * (math.pi / 2):
+                initial_pos_x = math.floor(player.rect.centerx / settings.TILE_SIZE) * settings.TILE_SIZE
                 horizontal_end_pos_x = initial_pos_x - (settings.TILE_SIZE * i)
                 horizontal_end_pos_y = player.rect.centery - (
                     tangent * abs(horizontal_end_pos_x - player.rect.centerx)
@@ -257,8 +256,17 @@ class Level:
 
         # check shortest ray
         if vertical_lengh <= horizontal_lengh:
-            return vertical_end_pos_x, vertical_end_pos_y
-        return horizontal_end_pos_x, horizontal_end_pos_y
+            return vertical_end_pos_x, vertical_end_pos_y, settings.RAY_COLOR_VERTICAL
+        return horizontal_end_pos_x, horizontal_end_pos_y, settings.RAY_COLOR_HORIZONTAL
+
+    def normalize_angle(self, angle: float) -> float:
+        """ normalize angle ( in radian ) on trigo circle
+        return a angle in radian """
+        while angle < 0:
+            angle += 2 * math.pi
+        while angle > (2 * math.pi):
+            angle -= 2 * math.pi
+        return angle
 
     def render_2D(self, canvas: pygame.Surface) -> None:
         """ 2D, blit tiles to a canvas render player"""
@@ -269,46 +277,60 @@ class Level:
         # all rays
         for ray_index in range(settings.FOV):
             angle = self.player.angle + math.radians(ray_index - (settings.FOV / 2))
-            x, y = self.cast_ray(
+            x, y, color = self.cast_ray(
                 player=self.player,
                 angle=angle
             )
             pygame.draw.line(
                 surface=canvas,
-                color=settings.RAY_COLOR,
-                start_pos=self.player.rect.center,
-                end_pos=(x, y),
+                color=color,
+                start_pos=(self.player.rect.centerx + settings.WIDTH, self.player.rect.centery),
+                end_pos=(x + settings.WIDTH, y),
             )
 
         self.player.render(canvas=canvas)
 
         # direction ray
+        x, y, color = self.cast_ray(
+            player=self.player,
+            angle=self.player.angle
+        )
         pygame.draw.line(
                 surface=canvas,
                 color=settings.RAY_DIRECTION_COLOR,
-                start_pos=self.player.rect.center,
-                end_pos=(self.cast_ray(
-                    player=self.player,
-                    angle=self.player.angle
-                )),
+                start_pos=(self.player.rect.centerx + settings.WIDTH, self.player.rect.centery),
+                end_pos=(x + settings.WIDTH, y),
             )
 
     def render_3D(self, canvas: pygame.Surface) -> None:
         """ 3D, draw vertical line for each rays"""
-        for ray_index in range(settings.FOV):
-            angle = self.player.angle + math.radians(ray_index - (settings.FOV / 2))
-            ray_x, ray_y = self.cast_ray(
+        for ray_index in range(settings.FOV + 1):
+            # get angles
+            player_angle_normalized = self.normalize_angle(self.player.angle)
+            ray_angle = self.normalize_angle(
+                player_angle_normalized +
+                math.radians(ray_index - (settings.FOV / 2))
+            )
+
+            # get ray
+            ray_x, ray_y, ray_color = self.cast_ray(
                 player=self.player,
-                angle=angle
+                angle=ray_angle
             )
 
             ray_len = math.sqrt(
-                abs(self.player.rect.x - ray_x) ** 2 +
-                abs(self.player.rect.y - ray_y) ** 2
+                (self.player.rect.x - ray_x) ** 2 +
+                (self.player.rect.y - ray_y) ** 2
             )
 
-            line_height = (settings.HEIGHT * settings.TILE_SIZE) / ray_len
+            angle_diff = self.normalize_angle(ray_angle - player_angle_normalized)
 
+
+            # fix fisheye effect
+            line_height = (settings.HEIGHT * settings.TILE_SIZE) / ray_len
+            line_height *= math.cos(angle_diff)
+
+            # center the lines
             start_y = (settings.HEIGHT - line_height) / 2
             end_y = start_y + line_height
 
@@ -316,7 +338,7 @@ class Level:
 
             pygame.draw.line(
                 surface=canvas,
-                color=settings.RAY_COLOR,
+                color=ray_color,
                 start_pos=(x, start_y),
                 end_pos=(x, end_y),
                 width=math.ceil(settings.WIDTH / settings.FOV),
@@ -336,5 +358,5 @@ class Tile:
         """ blit """
         canvas.blit(
                 source=self.image,
-                dest=self.rect
+                dest=(self.rect.x + settings.WIDTH, self.rect.y)
             )
