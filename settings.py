@@ -13,6 +13,7 @@ TILE_SIZE = 64
 GRID_GAP = 1
 
 # Rays
+RESOLUTION_MULTIPLIER = 2
 FOV = 90   # number of rays casted per frame
 MAX_RAY_DISTANCE = 20  # in tile_size
 RAY_MIN_DISTANCE = 0   # should be 0 or 1

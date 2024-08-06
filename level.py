@@ -80,12 +80,12 @@ class Level:
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
         ]
 
-        self.map = self.map_little
+        self.map = self.map_3
 
         self.player = Player()
         self.tiles = []
 
-        # create tiles
+        # create tiles for 2D rendering only
         for y, column in enumerate(self.map):
             for x, wall in enumerate(column):
                 if wall:
@@ -260,7 +260,7 @@ class Level:
         return horizontal_end_pos_x, horizontal_end_pos_y, settings.RAY_COLOR_HORIZONTAL
 
     def normalize_angle(self, angle: float) -> float:
-        """ normalize angle ( in radian ) on trigo circle
+        """ normalize angle ( in radian ) in 0, 2pi
         return a angle in radian """
         while angle < 0:
             angle += 2 * math.pi
@@ -309,12 +309,12 @@ class Level:
     # pylint: disable=invalid-name
     def render_3D(self, canvas: pygame.Surface) -> None:
         """ 3D, draw vertical line for each rays"""
-        for ray_index in range(settings.FOV + 1):
+        for ray_index in range((settings.FOV*settings.RESOLUTION_MULTIPLIER) + 1):
             # get angles
             player_angle_normalized = self.normalize_angle(self.player.angle)
             ray_angle = self.normalize_angle(
                 player_angle_normalized +
-                math.radians(ray_index - (settings.FOV / 2))
+                math.radians((ray_index/settings.RESOLUTION_MULTIPLIER) - (settings.FOV/2))
             )
 
             # get ray
@@ -339,14 +339,14 @@ class Level:
             start_y = (settings.HEIGHT - line_height) / 2
             end_y = start_y + line_height
 
-            x = ray_index * (settings.WIDTH / settings.FOV)
+            x = (ray_index/settings.RESOLUTION_MULTIPLIER) * (settings.WIDTH / settings.FOV)
 
             pygame.draw.line(
                 surface=canvas,
                 color=ray_color,
                 start_pos=(x, start_y),
-                end_pos=(x, end_y),
-                width=math.ceil(settings.WIDTH / settings.FOV),
+                end_pos=(x, end_y), 
+                width=math.ceil(settings.WIDTH / (settings.FOV*settings.RESOLUTION_MULTIPLIER)),
             )
 
 
