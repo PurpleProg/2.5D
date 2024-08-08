@@ -5,18 +5,18 @@ import settings
 
 
 class Player:
-    """ player, used to posision the camera """
+    """ player, used to position the camera """
     def __init__(self) -> None:
         self.image = pygame.Surface(size=(settings.PLAYER_SIZE, settings.PLAYER_SIZE))
         self.image.fill(settings.PLAYER_COLOR)
-        # i wont refractor all the raycaster self.rect is a Frect
+        # I won't refactor all the ray caster self.rect is a Frect
         self.rect: pygame.FRect = self.image.get_frect()
         self.rect.x = 128.0
         self.rect.y = 128.0
 
         self.speed = settings.PLAYER_SPEED
 
-        self.angle = 3 * (math.pi / 2) + 0.5 # in radian this is used for raycast
+        self.angle = 3 * (math.pi / 2) + 0.5  # in radian, this is used for casting the rays
 
     def update(self, keys: set) -> None:
         """" move the player and change angle"""

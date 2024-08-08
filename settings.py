@@ -14,7 +14,7 @@ GRID_GAP = 1
 
 # Rays
 RESOLUTION_MULTIPLIER = 10
-FOV = 60   # number of rays casted per frame
+FOV = 60   # number of rays cast per frame
 MAX_RAY_DISTANCE = 20  # in tile_size
 RAY_MIN_DISTANCE = 0   # should be 0 or 1
 

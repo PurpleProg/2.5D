@@ -6,7 +6,7 @@ import settings
 
 
 class Level:
-    """ handle map and raycasting """
+    """ handle map and ray casting """
     # pylint: disable=C0301
     def __init__(self) -> None:
         self.map_empty: list[list[int]] = [
@@ -84,7 +84,6 @@ class Level:
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
         ]
 
-
         self.map = self.map_3
 
         self.player = Player()
@@ -132,7 +131,7 @@ class Level:
                 vertical_end_pos_x = player.rect.centerx + (
                     invert_tangent * abs(vertical_end_pos_y - player.rect.centery)
                 )
-                # clamp map indexs to map size
+                # clamp map indexes to map size
                 map_index_y = min(
                     int(max(vertical_end_pos_y / settings.TILE_SIZE, 0)),
                     len(self.map) - 1
@@ -149,11 +148,11 @@ class Level:
                 vertical_end_pos_x = player.rect.centerx - (
                     invert_tangent * abs(vertical_end_pos_y - player.rect.centery)
                 )
-                # clamp map indexs to map size
+                # clamp map indexes to map size
                 map_index_y = min(
                     int(max(vertical_end_pos_y / settings.TILE_SIZE, 0)),
                     len(self.map) - 1
-                ) -1
+                ) - 1
                 map_index_x = min(
                     int(max(vertical_end_pos_x / settings.TILE_SIZE, 0)),
                     len(self.map[0]) - 1
@@ -170,8 +169,8 @@ class Level:
                     vertical_end_pos_y = player.rect.centery
                     vertical_end_pos_x = settings.WIDTH
                 else:
-                    raise ValueError(f'unhandle angle : {angle}')
-                # clamp map indexs to map size
+                    raise ValueError(f'unhandled angle : {angle}')
+                # clamp map indexes to map size
                 map_index_y = min(
                     int(max(vertical_end_pos_y / settings.TILE_SIZE, 0)),
                     len(self.map) - 1
@@ -181,9 +180,9 @@ class Level:
                     len(self.map[0]) - 1
                 )
 
-            # get the ray squared lengh (pytagore)
-            vertical_lengh_squared = (
-                ((player.rect.x - vertical_end_pos_x)** 2) +
+            # get the ray squared length (pytagore)
+            vertical_length_squared = (
+                ((player.rect.x - vertical_end_pos_x) ** 2) +
                 ((player.rect.y - vertical_end_pos_y) ** 2)
             )
 
@@ -191,7 +190,7 @@ class Level:
             if self.map[map_index_y][map_index_x]:
                 break
 
-        return vertical_end_pos_x, vertical_end_pos_y, vertical_lengh_squared
+        return vertical_end_pos_x, vertical_end_pos_y, vertical_length_squared
 
     def cast_horizontal_ray(self, player, angle) -> tuple[int, int, int]:
         """ calc a line to the nearest horizontal wall """
@@ -215,7 +214,7 @@ class Level:
                 horizontal_end_pos_y = player.rect.centery + (
                     tangent * abs(horizontal_end_pos_x - player.rect.centerx)
                 )
-                # clamp map indexs to map size
+                # clamp map indexes to map size
                 map_index_x = min(
                     int(max(horizontal_end_pos_x / settings.TILE_SIZE, 0)),
                     len(self.map[0]) - 1
@@ -231,11 +230,11 @@ class Level:
                 horizontal_end_pos_y = player.rect.centery - (
                     tangent * abs(horizontal_end_pos_x - player.rect.centerx)
                 )
-                # clamp map indexs to map size
+                # clamp map indexes to map size
                 map_index_x = min(
                     int(max(horizontal_end_pos_x / settings.TILE_SIZE, 0)),
                     len(self.map[0]) - 1
-                ) -1
+                ) - 1
                 map_index_y = min(
                     int(max(horizontal_end_pos_y / settings.TILE_SIZE, 0)),
                     len(self.map) - 1
@@ -251,8 +250,8 @@ class Level:
                     horizontal_end_pos_y = settings.HEIGHT
                     horizontal_end_pos_x = player.rect.centerx
                 else:
-                    print('unhandle angle')
-                # clamp map indexs to map size
+                    print('unhandled angle')
+                # clamp map indexes to map size
                 map_index_y = min(
                     int(max(horizontal_end_pos_y / settings.TILE_SIZE, 0)),
                     len(self.map) - 1
@@ -262,8 +261,8 @@ class Level:
                     len(self.map[0]) - 1
                 )
 
-            # get the squared ray lengh (pytagore)
-            horizontal_lengh = (
+            # get the squared ray length (pytagore)
+            horizontal_length = (
                 (abs(player.rect.x - horizontal_end_pos_x) ** 2) +
                 (abs(player.rect.y - horizontal_end_pos_y) ** 2)
             )
@@ -272,7 +271,7 @@ class Level:
             if self.map[map_index_y][map_index_x]:
                 break
 
-        return horizontal_end_pos_x, horizontal_end_pos_y, horizontal_lengh
+        return horizontal_end_pos_x, horizontal_end_pos_y, horizontal_length
 
     def normalize_angle(self, angle: float) -> float:
         """ normalize angle ( in radian ) in 0, 2pi
@@ -283,7 +282,7 @@ class Level:
             angle -= 2 * math.pi
         return angle
 
-    # i know the D is capital
+    # I know the D is capital
     # pylint: disable=invalid-name
     def render_2D(self, canvas: pygame.Surface) -> None:
         """ 2D, blit tiles to a canvas render player"""
@@ -324,7 +323,6 @@ class Level:
 
         self.player.render(canvas=canvas)
 
-
     # pylint: disable=invalid-name
     def render_3D(self, canvas: pygame.Surface) -> None:
         """ 3D, draw vertical line for each rays"""
@@ -362,12 +360,12 @@ class Level:
 
             angle_diff = self.normalize_angle(ray_angle - player_angle_normalized)
 
-            # get shortest ray by squared len
+            # get the shortest ray by squared len
             if vertical_ray_len_squared <= horizontal_ray_len_squared:
                 ray_x = vertical_ray_x
                 ray_y = vertical_ray_y
                 ray_len_squared = vertical_ray_len_squared
-                # print(f'angle:{ray_angle}, cos:{math.cos(ray_angle)}')
+                # print(f' angle:{ray_angle}, cos:{math.cos(ray_angle)}')
                 ray_len = (
                     (self.player.rect.y - ray_y) / math.cos(self.normalize_angle(ray_angle - (math.pi/2)))
                 )
@@ -392,7 +390,7 @@ class Level:
             start_y = (settings.HEIGHT - line_height) / 2
             end_y = start_y + line_height
 
-            # get x posision
+            # get x position
             x = (ray_index/settings.RESOLUTION_MULTIPLIER) * (settings.WIDTH / settings.FOV)
 
             # draw a vertical line for each ray
