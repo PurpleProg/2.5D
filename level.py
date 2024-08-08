@@ -366,17 +366,19 @@ class Level:
                 ray_y = vertical_ray_y
                 ray_len_squared = vertical_ray_len_squared
                 # print(f' angle:{ray_angle}, cos:{math.cos(ray_angle)}')
-                ray_len = (
-                    (self.player.rect.y - ray_y) / math.cos(self.normalize_angle(ray_angle - (math.pi/2)))
-                )
+                # ray_len = (
+                #     (self.player.rect.y - ray_y) / math.cos(self.normalize_angle(ray_angle - (math.pi/2)))
+                # )
+                ray_len = math.sqrt(ray_len_squared)
                 ray_color = settings.RAY_COLOR_VERTICAL
             else:
                 ray_x = horizontal_ray_x
                 ray_y = horizontal_ray_y
                 ray_len_squared = horizontal_ray_len_squared
-                ray_len = (
-                    (self.player.rect.x - ray_x) / math.cos(ray_angle)
-                )
+                # ray_len = (
+                #     (self.player.rect.x - ray_x) / math.cos(ray_angle)
+                # )
+                ray_len = math.sqrt(ray_len_squared)
                 ray_color = settings.RAY_COLOR_HORIZONTAL
 
             # fix fisheye effect
