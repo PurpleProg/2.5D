@@ -13,9 +13,9 @@ TILE_SIZE = 32
 GRID_GAP = 1
 
 # Rays
-RESOLUTION_MULTIPLIER = 10
+RESOLUTION_MULTIPLIER = 5
 FOV = 60   # number of rays cast per frame
-MAX_RAY_DISTANCE = 20  # in tile_size
+MAX_RAY_DISTANCE = 30  # in tile_size
 RAY_MIN_DISTANCE = 0   # should be 0 or 1
 
 ################ COLORS ###################

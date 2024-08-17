@@ -365,10 +365,19 @@ class Level:
 
         # draw walls
         for ray_index in range((settings.FOV*settings.RESOLUTION_MULTIPLIER) + 1):
+
+            # get x position
+            x = (ray_index/settings.RESOLUTION_MULTIPLIER) * (settings.WIDTH / settings.FOV)
+
             # get ray angle
-            ray_angle = self.normalize_angle(
-                self.normalize_angle(self.player.angle) +
-                math.radians((ray_index/settings.RESOLUTION_MULTIPLIER) - (settings.FOV/2))
+            # ray_angle = self.normalize_angle(
+            #     self.normalize_angle(self.player.angle) +
+            #     math.radians((ray_index/settings.RESOLUTION_MULTIPLIER) - (settings.FOV/2))
+            # )
+            ray_angle = (
+            self.normalize_angle(self.player.angle) + math.atan(
+                    (x - (settings.WIDTH / 2)) / 500
+                )
             )
 
             ray_x, ray_y, ray_len, ray_color = self.cast_ray(player=self.player, angle=ray_angle)
@@ -381,9 +390,6 @@ class Level:
             # center the lines
             start_y = (settings.HEIGHT - line_height) / 2
             end_y = start_y + line_height
-
-            # get x position
-            x = (ray_index/settings.RESOLUTION_MULTIPLIER) * (settings.WIDTH / settings.FOV)
 
             # draw a vertical line for each ray
             pygame.draw.line(
