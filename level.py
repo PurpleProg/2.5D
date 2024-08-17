@@ -273,6 +273,48 @@ class Level:
 
         return horizontal_end_pos_x, horizontal_end_pos_y, horizontal_length
 
+    def cast_ray(self, player: Player, angle: float) -> tuple[int, int, int, str]:
+        """ returns: x, y, len, color """
+        # get vertical ray
+        vertical_ray_x, vertical_ray_y, vertical_ray_len_squared = self.cast_vertical_ray(
+            player=self.player,
+            angle=angle
+        )
+
+        # get horizontal ray
+        horizontal_ray_x, horizontal_ray_y, horizontal_ray_len_squared = self.cast_horizontal_ray(
+            player=self.player,
+            angle=angle,
+        )
+
+        angle_diff = self.normalize_angle(angle - self.normalize_angle(self.player.angle))
+
+        # get the shortest ray by squared len
+        if vertical_ray_len_squared <= horizontal_ray_len_squared:
+            ray_x = vertical_ray_x
+            ray_y = vertical_ray_y
+            ray_len_squared = vertical_ray_len_squared
+            # print(f' angle:{ray_angle}, cos:{math.cos(ray_angle)}')
+            # ray_len = (
+            #     (self.player.rect.y - ray_y) / math.cos(self.normalize_angle(ray_angle - (math.pi/2)))
+            # )
+            ray_len = math.sqrt(ray_len_squared)
+            ray_color = settings.RAY_COLOR_VERTICAL
+        else:
+            ray_x = horizontal_ray_x
+            ray_y = horizontal_ray_y
+            ray_len_squared = horizontal_ray_len_squared
+            # ray_len = (
+            #     (self.player.rect.x - ray_x) / math.cos(ray_angle)
+            # )
+            ray_len = math.sqrt(ray_len_squared)
+            ray_color = settings.RAY_COLOR_HORIZONTAL
+
+        # fix fisheye effect
+        ray_len *= math.cos(angle_diff)
+
+        return ray_x, ray_y, ray_len, ray_color
+
     def normalize_angle(self, angle: float) -> float:
         """ normalize angle ( in radian ) in 0, 2pi
         return a angle in radian """
@@ -296,23 +338,7 @@ class Level:
         for ray_index in range(settings.FOV):
             ray_angle = self.player.angle + math.radians(ray_index - (settings.FOV / 2))
 
-            # get vertical ray
-            vertical_ray_x, vertical_ray_y, vertical_ray_len_squared = self.cast_vertical_ray(
-                player=self.player,
-                angle=ray_angle
-            )
-
-            # get horizontal ray
-            horizontal_ray_x, horizontal_ray_y, horizontal_ray_len_squared = self.cast_horizontal_ray(
-                player=self.player,
-                angle=ray_angle,
-            )
-
-            # check shortest ray by squared len
-            if vertical_ray_len_squared <= horizontal_ray_len_squared:
-                ray_x, ray_y, ray_color = vertical_ray_x, vertical_ray_y, settings.RAY_COLOR_VERTICAL
-            else:
-                ray_x, ray_y, ray_color = horizontal_ray_x, horizontal_ray_y, settings.RAY_COLOR_HORIZONTAL
+            ray_x, ray_y, ray_len, ray_color = self.cast_ray(player=self.player, angle=ray_angle)
 
             pygame.draw.line(
                 surface=canvas,
@@ -340,49 +366,13 @@ class Level:
         # draw walls
         for ray_index in range((settings.FOV*settings.RESOLUTION_MULTIPLIER) + 1):
             # get ray angle
-            player_angle_normalized = self.normalize_angle(self.player.angle)
             ray_angle = self.normalize_angle(
-                player_angle_normalized +
+                self.normalize_angle(self.player.angle) +
                 math.radians((ray_index/settings.RESOLUTION_MULTIPLIER) - (settings.FOV/2))
             )
 
-            # get vertical ray
-            vertical_ray_x, vertical_ray_y, vertical_ray_len_squared = self.cast_vertical_ray(
-                player=self.player,
-                angle=ray_angle
-            )
+            ray_x, ray_y, ray_len, ray_color = self.cast_ray(player=self.player, angle=ray_angle)
 
-            # get horizontal ray
-            horizontal_ray_x, horizontal_ray_y, horizontal_ray_len_squared = self.cast_horizontal_ray(
-                player=self.player,
-                angle=ray_angle,
-            )
-
-            angle_diff = self.normalize_angle(ray_angle - player_angle_normalized)
-
-            # get the shortest ray by squared len
-            if vertical_ray_len_squared <= horizontal_ray_len_squared:
-                ray_x = vertical_ray_x
-                ray_y = vertical_ray_y
-                ray_len_squared = vertical_ray_len_squared
-                # print(f' angle:{ray_angle}, cos:{math.cos(ray_angle)}')
-                # ray_len = (
-                #     (self.player.rect.y - ray_y) / math.cos(self.normalize_angle(ray_angle - (math.pi/2)))
-                # )
-                ray_len = math.sqrt(ray_len_squared)
-                ray_color = settings.RAY_COLOR_VERTICAL
-            else:
-                ray_x = horizontal_ray_x
-                ray_y = horizontal_ray_y
-                ray_len_squared = horizontal_ray_len_squared
-                # ray_len = (
-                #     (self.player.rect.x - ray_x) / math.cos(ray_angle)
-                # )
-                ray_len = math.sqrt(ray_len_squared)
-                ray_color = settings.RAY_COLOR_HORIZONTAL
-
-            # fix fisheye effect
-            ray_len *= math.cos(angle_diff)
             line_height = min(
                 ((settings.HEIGHT * settings.TILE_SIZE) / ray_len),
                 settings.HEIGHT,
