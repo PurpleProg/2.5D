@@ -335,8 +335,18 @@ class Level:
             tile.render(canvas=canvas)
 
         # all rays
-        for ray_index in range(settings.FOV):
-            ray_angle = self.player.angle + math.radians(ray_index - (settings.FOV / 2))
+        for ray_index in range(int(settings.FOV * settings.RESOLUTION_MULTIPLIER)):
+
+            # get x position
+            # x = (ray_index / settings.RESOLUTION_MULTIPLIER) * (settings.WIDTH / settings.FOV)
+
+            # relative_angle = math.atan(
+                    # (x - (settings.WIDTH / 2)) / settings.PROJECTION_DISTANCE
+                # )
+
+            # ray_angle = self.player.angle + relative_angle * (settings.FOV / 70)
+
+            ray_angle = self.player.angle + math.radians((ray_index / settings.RESOLUTION_MULTIPLIER) - (settings.FOV / 2))
 
             ray_x, ray_y, ray_len, ray_color = self.cast_ray(player=self.player, angle=ray_angle)
 
@@ -364,21 +374,14 @@ class Level:
         )
 
         # draw walls
-        for ray_index in range((settings.FOV*settings.RESOLUTION_MULTIPLIER) + 1):
+        for ray_index in range(int(settings.FOV*settings.RESOLUTION_MULTIPLIER) + 1):
 
             # get x position
             x = (ray_index/settings.RESOLUTION_MULTIPLIER) * (settings.WIDTH / settings.FOV)
 
-            # get ray angle
-            # ray_angle = self.normalize_angle(
-            #     self.normalize_angle(self.player.angle) +
-            #     math.radians((ray_index/settings.RESOLUTION_MULTIPLIER) - (settings.FOV/2))
-            # )
-            ray_angle = (
-            self.normalize_angle(self.player.angle) + math.atan(
+            ray_angle = self.player.angle + math.atan(
                     (x - (settings.WIDTH / 2)) / settings.PROJECTION_DISTANCE
                 )
-            )
 
             ray_x, ray_y, ray_len, ray_color = self.cast_ray(player=self.player, angle=ray_angle)
 

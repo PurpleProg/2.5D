@@ -93,6 +93,7 @@ class Game:
         """ render the level """
 
         self.level.render_3D(self.display)
+        # self.level.render_2D(self.display)
 
         # render a 2D minimap
         self.level.render_2D(self.minimap)
