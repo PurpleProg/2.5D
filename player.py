@@ -21,6 +21,12 @@ class Player:
     def update(self, keys: set) -> None:
         """" move the player and change angle"""
 
+        # check running
+        if 'SHIFT' in keys:
+            self.speed = settings.PLAYER_SPEED * 3
+        else:
+            self.speed = settings.PLAYER_SPEED
+
         # move player
         if 'UP' in keys:
             self.rect.x += math.cos(self.angle) * self.speed

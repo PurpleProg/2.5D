@@ -62,20 +62,28 @@ class Game:
                             self.keys.add('a')
                         case pygame.K_d:
                             self.keys.add('d')
+                        case pygame.K_LSHIFT:
+                            self.keys.add('SHIFT')
+                        case pygame.K_RSHIFT:
+                            self.keys.add('SHIFT')
                 case pygame.KEYUP:
                     match event.key:
                         case pygame.K_RIGHT:
-                            self.keys.remove('RIGHT')
+                            self.keys.discard('RIGHT')
                         case pygame.K_LEFT:
-                            self.keys.remove('LEFT')
+                            self.keys.discard('LEFT')
                         case pygame.K_UP:
-                            self.keys.remove('UP')
+                            self.keys.discard('UP')
                         case pygame.K_DOWN:
-                            self.keys.remove('DOWN')
+                            self.keys.discard('DOWN')
                         case pygame.K_a:
-                            self.keys.remove('a')
+                            self.keys.discard('a')
                         case pygame.K_d:
-                            self.keys.remove('d')
+                            self.keys.discard('d')
+                        case pygame.K_LSHIFT:
+                            self.keys.discard('SHIFT')
+                        case pygame.K_RSHIFT:
+                            self.keys.discard('SHIFT')
 
     def update(self) -> None:
         """ update the level """
@@ -83,7 +91,6 @@ class Game:
 
     def render(self) -> None:
         """ render the level """
-        self.display.fill(settings.BACKGROUND_COLOR)
 
         self.level.render_3D(self.display)
 

@@ -376,7 +376,7 @@ class Level:
             # )
             ray_angle = (
             self.normalize_angle(self.player.angle) + math.atan(
-                    (x - (settings.WIDTH / 2)) / 500
+                    (x - (settings.WIDTH / 2)) / settings.PROJECTION_DISTANCE
                 )
             )
 

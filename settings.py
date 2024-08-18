@@ -13,6 +13,7 @@ TILE_SIZE = 32
 GRID_GAP = 1
 
 # Rays
+PROJECTION_DISTANCE = 750
 RESOLUTION_MULTIPLIER = 5
 FOV = 60   # number of rays cast per frame
 MAX_RAY_DISTANCE = 30  # in tile_size
