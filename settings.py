@@ -14,9 +14,11 @@ GRID_GAP = 1
 
 # Rays
 PROJECTION_DISTANCE = 750
-RESOLUTION_MULTIPLIER = 3
+RESOLUTION_MULTIPLIER = 5
 FOV = 90   # number of rays cast per frame
 MAX_RAY_DISTANCE = 30  # in tile_size
+
+# deprecated (i think)
 RAY_MIN_DISTANCE = 0   # should be 0 or 1
 
 ################ COLORS ###################

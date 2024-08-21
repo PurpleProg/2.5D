@@ -84,10 +84,9 @@ class Level:
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
         ]
 
-        self.map = self.map_3
+        self.map = self.map_little
 
         self.player = Player()
-        self.tiles = []
 
         # background
         self.floor = pygame.Surface(size=(settings.WIDTH, settings.HEIGHT//2))
@@ -95,7 +94,8 @@ class Level:
         self.sky = pygame.Surface(size=(settings.WIDTH, settings.HEIGHT//2))
         self.sky.fill(settings.SKY_COLOR)
 
-        # create tiles for 2D rendering only
+        # create tiles for the 2D rendering
+        self.tiles: list[Tile] = []
         for y, column in enumerate(self.map):
             for x, wall in enumerate(column):
                 if wall:
@@ -273,7 +273,7 @@ class Level:
 
         return horizontal_end_pos_x, horizontal_end_pos_y, horizontal_length
 
-    def cast_ray(self, player: Player, angle: float) -> tuple[int, int, int, str]:
+    def cast_ray(self, player: Player, angle: float) -> tuple[int, int, float, str]:
         """ returns: x, y, len, color """
         # get vertical ray
         vertical_ray_x, vertical_ray_y, vertical_ray_len_squared = self.cast_vertical_ray(
@@ -287,7 +287,7 @@ class Level:
             angle=angle,
         )
 
-        angle_diff = self.normalize_angle(angle - self.normalize_angle(self.player.angle))
+        angle_diff = self.normalize_angle(angle - self.player.angle)
 
         # get the shortest ray by squared len
         if vertical_ray_len_squared <= horizontal_ray_len_squared:
@@ -296,7 +296,7 @@ class Level:
             ray_len_squared = vertical_ray_len_squared
             # print(f' angle:{ray_angle}, cos:{math.cos(ray_angle)}')
             # ray_len = (
-            #     (self.player.rect.y - ray_y) / math.cos(self.normalize_angle(ray_angle - (math.pi/2)))
+                # (self.player.rect.y - ray_y) / math.sin(self.normalize_angle(angle))
             # )
             ray_len = math.sqrt(ray_len_squared)
             ray_color = settings.RAY_COLOR_VERTICAL
@@ -305,7 +305,7 @@ class Level:
             ray_y = horizontal_ray_y
             ray_len_squared = horizontal_ray_len_squared
             # ray_len = (
-            #     (self.player.rect.x - ray_x) / math.cos(ray_angle)
+                # (self.player.rect.x - ray_x) / math.cos(self.normalize_angle(angle))
             # )
             ray_len = math.sqrt(ray_len_squared)
             ray_color = settings.RAY_COLOR_HORIZONTAL
@@ -378,10 +378,21 @@ class Level:
 
             # get x position
             x = (ray_index/settings.RESOLUTION_MULTIPLIER) * (settings.WIDTH / settings.FOV)
+            x += 1  # avoid ZeroDivisionError
 
             ray_angle = self.player.angle + math.atan(
                     (x - (settings.WIDTH / 2)) / settings.PROJECTION_DISTANCE
                 )
+
+            # chatGPT
+            # ray_angle_what = (
+            ray_angle = (
+                (self.player.angle - math.radians((settings.FOV)/2))
+                +
+                ray_index / (settings.FOV * settings.RESOLUTION_MULTIPLIER)
+            )
+
+            # print(f'used:{ray_angle}, weird:{ray_angle_what}')
 
             ray_x, ray_y, ray_len, ray_color = self.cast_ray(player=self.player, angle=ray_angle)
 
